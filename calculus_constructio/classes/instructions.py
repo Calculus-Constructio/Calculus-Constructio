@@ -256,3 +256,8 @@ def halt(s: Any) -> NoReturn:
     sys.stderr.write("Program has halted.")
     print(s)
     sys.exit(0)
+
+
+@instruction("Print", 1, ">")
+def prin(s: Any) -> None:
+    print(s)
