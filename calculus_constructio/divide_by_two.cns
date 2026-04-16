@@ -1,0 +1,9 @@
+p:Index input, zero
+line:Line zero, p
+c1:Circle p, zero
+c2:Circle zero, p
+inter:Intersect c1, c2
+p1:Index inter, zero
+p2:Index inter, one
+line2:Line p1, p2
+output:Intersect line, line2
