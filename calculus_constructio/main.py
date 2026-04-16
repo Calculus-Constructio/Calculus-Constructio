@@ -44,12 +44,12 @@ def parse_prog(prog: str)\
                     code = parse_prog(file.read())
                 m.append(CModule(*code, {}, var))
         elif instruction in ("Define", "$"):
-            d = c
-            while single_parse(lines[d]) not in [
+            p = c
+            while single_parse(lines[c]) not in [
                 (var, "EndDefine"), (var, "%")
             ]:
-                d += 1
-            code = parse_prog('\n'.join(lines[c+1:d]))
+                c += 1
+            code = parse_prog('\n'.join(lines[p+1:c]))
             f.append(CFunction(*code, var, args))
         else:
             s.append(Statement(var, instruction, args))
