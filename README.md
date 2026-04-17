@@ -2,6 +2,8 @@
 A programming language involving the construction of lines, circles, polynomial and parametric curves, and intersections.
 
 To execute, run `python main.py` along with the necessary arguments below.
+## Links
+* [Esolangs.org entry](https://esolangs.org/wiki/Calculus_Constructio#List_of_instructions)
 ## Command line arguments
 ### `-p`, `--program`
 Insert the file path to the program here.
