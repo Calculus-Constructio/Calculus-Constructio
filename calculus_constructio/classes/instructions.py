@@ -175,6 +175,11 @@ def index(lisst: list, p: Point) -> Any:
     return lisst[int(p.x)]
 
 
+@instruction("Slice", 3, "S")
+def slice(lisst: list, start_p: Point, end_p: Point) -> list:
+    return lisst[int(start_p.x):int(end_p.x)]
+
+
 @instruction("Polynomial", None, "P")
 def poly(*args: Point) -> Polynomial:
     return Polynomial(*args)
