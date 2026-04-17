@@ -1,5 +1,5 @@
 # Calculus Constructio
-A programming language involving the construction of lines, circles and intersections.
+A programming language involving the construction of lines, circles, polynomial and parametric curves, and intersections.
 
 To execute, run `python main.py` along with the necessary arguments below.
 ## Command line arguments
