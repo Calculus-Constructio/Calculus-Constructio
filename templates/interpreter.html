@@ -1,33 +1,21 @@
-<textarea id="code">
-
-</textarea>
-<textarea id="input">
-
-</textarea>
-<textarea disabled id="output">
-
-</textarea>
-<input id="flag" type="text"/>
+<!DOCTYPE HTML>
+<div id="run">
+<textarea id="code" autocorrect="off" form="run" name="code"></textarea>
+<textarea id="input" autocorrect="off" form="run" name="input"></textarea>
+<textarea readonly id="output"></textarea>
+<input id="flag" type="text" name="flag"/>
 <input id="submit" type="button" value="Run"/>
+</div>
 <script>
-document.getElementById("submit").onclick=async() => { // Stolen from https://stackoverflow.com/a/67509739
-  await runCode();
+window.post = function(url, data) {
+  return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
+}
+async function doit() {
+    let promise = post(`${document.URL}interpret/`, {'code': document.getElementById("code").value, 'input': document.getElementById("input").value, 'flag': document.getElementById("flag").value})
+    let response = await promise.then(function(response){return response.text();})
+    document.getElementById("output").value = response
+}
+document.getElementById("submit").onclick=async() => {
+  await doit();
 };
-
-function convertToHex(str) { // Stolen from https://stackoverflow.com/questions/21647928/javascript-unicode-string-to-hex
-    var hex = '';
-    for(var i=0;i<str.length;i++) {
-        hex += ''+str.charCodeAt(i).toString(16);
-    }
-    return hex;
-}
-
-async function runCode() {
-    code = convertToHex(document.getElementById("code").value)
-    input = convertToHex(document.getElementById("input").value)
-    flag = document.getElementById("flag").value
-    url = `${document.URL}interpret/${code}/${input}/${flag}`
-    result = await fetch(url).then(function (response) {return response.text();})
-    document.getElementById("output").value = result
-}
 </script>
