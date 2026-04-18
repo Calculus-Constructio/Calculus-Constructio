@@ -3,17 +3,24 @@
 <textarea id="code" autocorrect="off" form="run" name="code"></textarea>
 <textarea id="input" autocorrect="off" form="run" name="input"></textarea>
 <textarea readonly id="output"></textarea>
+<textarea readonly id="error"></textarea>
 <input id="flag" type="text" name="flag"/>
 <input id="submit" type="button" value="Run"/>
+<p id="warning"></p>
 </div>
 <script>
 window.post = function(url, data) {
   return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
 }
 async function doit() {
+    document.getElementById("warning").innerText = ""
     let promise = post(`${document.URL}interpret/`, {'code': document.getElementById("code").value, 'input': document.getElementById("input").value, 'flag': document.getElementById("flag").value})
-    let response = await promise.then(function(response){return response.text();})
-    document.getElementById("output").value = response
+    let response = await promise.then(function(response){return response.json();})
+    document.getElementById("output").value = response["output"]
+    document.getElementById("error").value = response["error"]
+    if (response["timeout_warning"]) {
+        document.getElementById("warning").innerText = "The program exceeded the 60 second time limit and was killed."
+    }
 }
 document.getElementById("submit").onclick=async() => {
   await doit();
