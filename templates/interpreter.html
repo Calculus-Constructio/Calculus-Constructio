@@ -6,11 +6,12 @@ textarea {
   resize: none;
   width: 100%;
 }
-p {text-align: center;}
-#submit {text-align: center;}
+p, h1, #submit {text-align: center;}
 </style>
 </head>
 <body>
+<h1><a href="https://esolangs.org/wiki/Calculus_Constructio">Calculus Constructio</a> Web Interpreter</h1>
+<p>This website allows you to run any code in the language Calculus Constructio. The source code for this website is <a href="https://github.com/Calculus-Constructio/Calculus-Constructio-Web">here</a>.</p>
 <div id="run">
 <h3>Code</h3>
 <textarea id="code" autocorrect="off" form="run" name="code"></textarea>
@@ -41,6 +42,7 @@ window.post = function(url, data) {
   return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
 }
 function resize(textarea) {
+  textarea.style.height = "0px"
   textarea.style.height = textarea.scrollHeight + "px";
   textarea.style.overflowY = "hidden";
 }
