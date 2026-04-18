@@ -1,5 +1,6 @@
 import re
 import argparse
+from ast import literal_eval
 from typing import List, Any, Optional, Tuple
 from classes.instructions import (
     Statement,
@@ -132,7 +133,7 @@ if __name__ == "__main__":
         with open(inp_file) as file:
             inp = file.read()
         if CFlag.UseUnicodeInput not in flags:
-            inp = [*map(lambda x: Point(*eval(x)), inp.split("\n"))]
+            inp = [*map(lambda x: Point(*literal_eval(x)), inp.split("\n"))]
     else:
         inp = "" if CFlag.UseUnicodeInput in flags else []
     result = evaluate_prog(*parse_prog(code), inp, flags)
