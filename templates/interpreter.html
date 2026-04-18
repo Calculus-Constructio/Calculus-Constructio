@@ -1,0 +1,28 @@
+<textarea id="code">
+
+</textarea>
+<textarea id="input">
+
+</textarea>
+<textarea disabled id="output">
+
+</textarea>
+<input id="flag" type="text"/>
+<input id="submit" type="button" value="Run" onclick="await runCode();"/>
+<script>
+function convertToHex(str) { // Stolen from https://stackoverflow.com/questions/21647928/javascript-unicode-string-to-hex
+    var hex = '';
+    for(var i=0;i<str.length;i++) {
+        hex += ''+str.charCodeAt(i).toString(16);
+    }
+    return hex;
+}
+async function runCode() {
+    code = convertToHex(document.getElementById("code").value)
+    input = convertToHex(document.getElementById("input").value)
+    flag = document.getElementById("flag").value
+    url = `${document.URL}/${code}/${input}/${flag}`
+    result = await fetch(url).then(function (response) {return response.text();})
+    document.getElementById("output").value = result
+}
+</script>
