@@ -16,6 +16,7 @@ textarea {
   resize: none;
   width: 100%;
   min-height: 40px;
+  font-family: monospace;
 }
 .expand {width: 50%;}
 p:not(.h), h1, button, .center {text-align: center;}
@@ -25,8 +26,6 @@ p:not(.h), h1, button, .center {text-align: center;}
 <body>
 <h1><a href="https://esolangs.org/wiki/Calculus_Constructio">Calculus Constructio</a> Web Interpreter</h1>
 <p>This website allows you to run any code in the language Calculus Constructio. The source code for this website is <a href="https://github.com/Calculus-Constructio/Calculus-Constructio-Web">here</a>.</p>
-<br/>
-<p>Please note that you will need to manually click on the dropdowns to see their particular fields.</p>
 <div id="run">
 <p class="h"><button type="button" id="code_button" data-toggle="collapse" data-target="#code_div" class="arrow">Code ▼</button></p>
 <div id="code_div" class="collapse">
@@ -72,7 +71,7 @@ p:not(.h), h1, button, .center {text-align: center;}
 <script>
 document.querySelectorAll(".arrow").forEach(function(button) {
   button.onclick = function() {
-    text = button.innerText.substring(0, button.innerText.length - 1);
+    let text = button.innerText.substring(0, button.innerText.length - 1);
     setTimeout(function() {
       if (button.ariaExpanded === "true") {
         button.innerText = text + "▲";
@@ -92,7 +91,7 @@ document.querySelectorAll("textarea").forEach(function(textarea) {
   });
 });
 function resize(textarea) {
-  textarea.style.height = "0px"
+  textarea.style.height = "0px";
   textarea.style.height = textarea.scrollHeight + "px";
   textarea.style.overflowY = "hidden";
 }
@@ -117,67 +116,75 @@ addEventListener("DOMContentLoaded", function() {
     };
 });
 function copyURL() {
-  button = document.getElementById("copy_link")
+  button = document.getElementById("copy_link");
   navigator.clipboard.writeText(document.getElementById("url").value).then(
     () => {
-      button.value = "Copied to clipboard!"
-      setTimeout(() => {button.value = "Copy"}, 1500)
+      button.value = "Copied to clipboard!";
+      setTimeout(() => {button.value = "Copy"}, 1500);
     },
     () => {
-      button.value = "Failed to copy to clipboard!"
-      setTimeout(() => {button.value = "Copy"}, 1500)
+      button.value = "Failed to copy to clipboard!";
+      setTimeout(() => {button.value = "Copy"}, 1500);
     },
   );
-}
+};
 function toLink() {
   base_url = document.URL;
   if (base_url.includes("#")) {
-    base_url = url.substring(0, url.indexOf('#'))
-  }
+    base_url = url.substring(0, url.indexOf('#'));
+  };
   code = new TextEncoder().encode(document.getElementById("code").value).toBase64({alphabet: 'base64url', omitPadding: true});
   input = new TextEncoder().encode(document.getElementById("input").value).toBase64({alphabet: 'base64url', omitPadding: true});
   flag = getFlagValue();
-  url = `${base_url}#${code}!${input}!${flag}`
-  document.getElementById("url").value = url
-}
+  url = `${base_url}#${code}!${input}!${flag}`;
+  document.getElementById("url").value = url;
+};
 window.post = function(url, data) {
   return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
-}
+};
 function getFlagValue() {
     return (document.getElementById("OutputAllVars").checked*4 + document.getElementById("UseUnicodeOutput").checked*2 + document.getElementById("UseUnicodeInput").checked*1)
 };
 let lock = false
 async function doit() {
     if (!lock) {
-        lock = true
-        base_url = document.URL
+        lock = true;
+        base_url = document.URL;
         if (base_url.includes("#")) {
-          base_url = url.substring(0, url.indexOf('#'))
+          base_url = url.substring(0, url.indexOf('#'));
         }
-        document.getElementById("status").innerText = "Running..."
-        document.getElementById("warning").innerHTML = ""
-        document.getElementById("output").innerText = ""
-        document.getElementById("error").innerText = ""
-        let promise = post(`${base_url}interpret/`, {'code': document.getElementById("code").value, 'input': document.getElementById("input").value, 'flag': getFlagValue()});
-        let response = await promise.then(function(response){return response.json();});
-        document.getElementById("output").value = response["output"];
-        document.getElementById("error").value = response["error"];
-        console.log(response["error"])
-        resize(document.getElementById("output"));
-        resize(document.getElementById("error"));
-        setTimeout(function() {$("#out_button").click()}, 100)
-        setTimeout(function() {$("#err_button").click()}, 200)
-        document.getElementById("warning").innerHTML = `${"The program exceeded the 60 second time limit and was killed.".repeat(response.timeout_warning)}<br/>${"STDOUT exceeded 128,000 characters".repeat(response.memory_warning.stdout)}<br/>${"STDERR exceeded 128,000 characters".repeat(response.memory_warning.stderr)}`;
-        document.getElementById("status").innerText = ""
+        document.getElementById("status").innerText = "Running...";
+        document.getElementById("warning").innerHTML = "";
+        document.getElementById("output").innerText = "";
+        document.getElementById("error").innerText = "";
+        try {
+          let promise = post(`${base_url}interpret/`, {'code': document.getElementById("code").value, 'input': document.getElementById("input").value, 'flag': getFlagValue()});
+          let response = await promise.then(function(response){return response.json();});
+          document.getElementById("output").value = response["output"];
+          document.getElementById("error").value = response["error"];
+          resize(document.getElementById("output"));
+          resize(document.getElementById("error"));
+          if (!($("#out_button").ariaExpanded === "true")) {
+            $("#out_button").click();
+          };
+          if (!($("#err_button").ariaExpanded === "true")) {
+            $("#err_button").click();
+          };
+          document.getElementById("warning").innerHTML = `<br/>${"The program exceeded the 60 second time limit and was killed.".repeat(response.timeout_warning)}<br/>${"STDOUT exceeded 128,000 characters".repeat(response.memory_warning.stdout)}<br/>${"STDERR exceeded 128,000 characters".repeat(response.memory_warning.stderr)}`;
+          document.getElementById("status").innerText = "";
+        } catch (error) {
+          document.getElementById("warning").innerHTML = `<br/>There was an error with backend communication!<br/><pre>${error}</pre>`;
+          document.getElementById("status").innerText = "";
+        };
         lock = false
-    }
+    };
 };
 document.getElementById("submit").onclick=async() => {
   await doit();
 };
-setTimeout(function() {$("#code_button").click()}, 100)
-setTimeout(function() {$("#input_button").click()}, 200)
-setTimeout(function() {$("#flag_button").click()}, 300)
+$("#code_button").click();
+$("#input_button").click();
+$("#flag_button").click();
 </script>
 </body>
 </html>
