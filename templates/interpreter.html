@@ -165,8 +165,8 @@ async function doit() {
         console.log(response["error"])
         resize(document.getElementById("output"));
         resize(document.getElementById("error"));
-        setTimeout(function() {$("#out_button").click()}, 10)
-        setTimeout(function() {$("#err_button").click()}, 20)
+        setTimeout(function() {$("#out_button").click()}, 100)
+        setTimeout(function() {$("#err_button").click()}, 200)
         document.getElementById("warning").innerHTML = `${"The program exceeded the 60 second time limit and was killed.".repeat(response.timeout_warning)}<br/>${"STDOUT exceeded 128,000 characters".repeat(response.memory_warning.stdout)}<br/>${"STDERR exceeded 128,000 characters".repeat(response.memory_warning.stderr)}`;
         document.getElementById("status").innerText = ""
         lock = false
@@ -175,9 +175,9 @@ async function doit() {
 document.getElementById("submit").onclick=async() => {
   await doit();
 };
-setTimeout(function() {$("#code_button").click()}, 10)
-setTimeout(function() {$("#input_button").click()}, 20)
-setTimeout(function() {$("#flag_button").click()}, 30)
+setTimeout(function() {$("#code_button").click()}, 100)
+setTimeout(function() {$("#input_button").click()}, 200)
+setTimeout(function() {$("#flag_button").click()}, 300)
 </script>
 </body>
 </html>
