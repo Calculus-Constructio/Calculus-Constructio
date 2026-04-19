@@ -160,10 +160,10 @@ async function doit() {
         try {
           let promise = post(`${base_url}interpret/`, {'code': document.getElementById("code").value, 'input': document.getElementById("input").value, 'flag': getFlagValue()});
           let response = await promise.then(function(response){return response.json();});
-          if ($("#out_button").ariaExpanded === "false" || $("#out_button").ariaExpanded === "undefined" || $("#out_button").ariaExpanded === null) {
+          if ($("#out_button")[0].ariaExpanded === "false" || $("#out_button")[0].ariaExpanded === "undefined" || $("#out_button")[0].ariaExpanded === null) {
             $("#out_button").click();
           };
-          if ($("#err_button").ariaExpanded === "false" || $("#err_button").ariaExpanded === "undefined" || $("#err_button").ariaExpanded === null) {
+          if ($("#err_button")[0].ariaExpanded === "false" || $("#err_button")[0].ariaExpanded === "undefined" || $("#err_button")[0].ariaExpanded === null) {
             $("#err_button").click();
           };
           document.getElementById("output").value = response["output"];
