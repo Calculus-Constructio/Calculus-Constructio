@@ -1,38 +1,62 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 <style>
+button {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  overflow: hidden;
+  outline: none;
+}
 textarea {
   resize: none;
   width: 100%;
+  min-height: 40px;
 }
 .expand {width: 50%;}
-p, h1, .center {text-align: center;}
+p:not(.h), h1, button, .center {text-align: center;}
+.h {font-size: 2rem;}
 </style>
 </head>
 <body>
 <h1><a href="https://esolangs.org/wiki/Calculus_Constructio">Calculus Constructio</a> Web Interpreter</h1>
 <p>This website allows you to run any code in the language Calculus Constructio. The source code for this website is <a href="https://github.com/Calculus-Constructio/Calculus-Constructio-Web">here</a>.</p>
+<br/>
+<p>Please note that you will need to manually click on the dropdowns to see their particular fields.</p>
 <div id="run">
-<h3>Code</h3>
-<textarea id="code" autocorrect="off" name="code" spellcheck="false"></textarea>
+<p class="h"><button type="button" id="code_button" data-toggle="collapse" data-target="#code_div" class="arrow">Code ▼</button></p>
+<div id="code_div" class="collapse">
+<textarea id="code" autocorrect="off" name="code" spellcheck="false" placeholder="Enter code here..."></textarea>
+</div>
 <br/>
-<h3>Input</h3>
-<textarea id="input" autocorrect="off" name="input" spellcheck="false"></textarea>
+<p class="h"><button type="button" id="input_button" data-toggle="collapse" data-target="#input_div" class="arrow">Input ▼</button></p>
+<div id="input_div" class="collapse">
+<textarea id="input" autocorrect="off" name="input" spellcheck="false" placeholder="Enter input here..."></textarea>
+</div>
 <br/>
-<h3>STDOUT</h3>
-<textarea readonly id="output"></textarea>
+<p class="h"><button type="button" id="out_button" data-toggle="collapse" data-target="#output_div" class="arrow">STDOUT ▼</button></p>
+<div id="output_div" class="collapse">
+<textarea readonly id="output" placeholder="STDOUT will appear here..."></textarea>
+</div>
 <br/>
-<h3>STDERR</h3>
-<textarea readonly id="error"></textarea>
+<p class="h"><button type="button" id="err_button" data-toggle="collapse" data-target="#error_div" class="arrow">STDERR ▼</button></p>
+<div id="error_div" class="collapse">
+<textarea readonly id="error" placeholder="STDERR will appear here..."></textarea>
+</div>
 <br/>
-<h3>Flags</h3>
+<p class="h"><button type="button" id="flag_button" data-toggle="collapse" data-target="#flags" class="arrow">Flags ▼</button></p>
+<div id="flags" class="collapse">
 <input type="checkbox" id="UseUnicodeInput"/>
 <label for="UseUnicodeInput">UseUnicodeInput</label><br/>
 <input type="checkbox" id="UseUnicodeOutput"/>
 <label for="UseUnicodeOutput">UseUnicodeOutput</label><br/>
 <input type="checkbox" id="OutputAllVars"/>
 <label for="OutputAllVars">OutputAllVars</label><br/>
+</div>
 <br/>
 <div style="text-align:center;">
 <p id="status"></p>
@@ -46,6 +70,27 @@ p, h1, .center {text-align: center;}
 </div>
 </div>
 <script>
+document.querySelectorAll(".arrow").forEach(function(button) {
+  button.onclick = function() {
+    text = button.innerText.substring(0, button.innerText.length - 1);
+    setTimeout(function() {
+      if (button.ariaExpanded === "true") {
+        button.innerText = text + "▲";
+      } else {
+        button.innerText = text + "▼";
+      };
+    })
+  };
+})
+document.querySelectorAll("textarea").forEach(function(textarea) {
+  textarea.style.height = textarea.scrollHeight + "px";
+  textarea.style.overflowY = "hidden";
+
+  textarea.addEventListener("input", function() {
+    this.style.height = "auto";
+    this.style.height = this.scrollHeight + "px";
+  });
+});
 function resize(textarea) {
   textarea.style.height = "0px"
   textarea.style.height = textarea.scrollHeight + "px";
@@ -98,15 +143,6 @@ function toLink() {
 window.post = function(url, data) {
   return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
 }
-document.querySelectorAll("textarea").forEach(function(textarea) {
-  textarea.style.height = textarea.scrollHeight + "px";
-  textarea.style.overflowY = "hidden";
-
-  textarea.addEventListener("input", function() {
-    this.style.height = "auto";
-    this.style.height = this.scrollHeight + "px";
-  });
-});
 function getFlagValue() {
     return (document.getElementById("OutputAllVars").checked*4 + document.getElementById("UseUnicodeOutput").checked*2 + document.getElementById("UseUnicodeInput").checked*1)
 };
@@ -119,7 +155,7 @@ async function doit() {
           base_url = url.substring(0, url.indexOf('#'))
         }
         document.getElementById("status").innerText = "Running..."
-        document.getElementById("warning").innerText = ""
+        document.getElementById("warning").innerHTML = ""
         document.getElementById("output").innerText = ""
         document.getElementById("error").innerText = ""
         let promise = post(`${base_url}interpret/`, {'code': document.getElementById("code").value, 'input': document.getElementById("input").value, 'flag': getFlagValue()});
@@ -128,9 +164,9 @@ async function doit() {
         document.getElementById("error").value = response["error"];
         resize(document.getElementById("output"));
         resize(document.getElementById("error"));
-        if (response["timeout_warning"]) {
-            document.getElementById("warning").innerText = "The program exceeded the 60 second time limit and was killed.";
-        }
+        setTimeout(function() {$("#out_button").click()}, 10)
+        setTimeout(function() {$("#err_button").click()}, 20)
+        document.getElementById("warning").innerHTML = `${"The program exceeded the 60 second time limit and was killed.".repeat(response.timeout_warning)}<br/>${"STDOUT exceeded 128,000 characters".repeat(response.memory_warning.stdout)}<br/>${"STDERR exceeded 128,000 characters".repeat(response.memory_warning.stderr)}`;
         document.getElementById("status").innerText = ""
         lock = false
     }
@@ -138,6 +174,9 @@ async function doit() {
 document.getElementById("submit").onclick=async() => {
   await doit();
 };
+setTimeout(function() {$("#code_button").click()}, 10)
+setTimeout(function() {$("#input_button").click()}, 20)
+setTimeout(function() {$("#flag_button").click()}, 30)
 </script>
 </body>
 </html>

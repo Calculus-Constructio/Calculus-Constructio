@@ -29,7 +29,9 @@ def interpret():
   p_path = "calculus_constructio/main.py"
   try:
     data = subprocess.run(shlex.split(f'python "{p_path}" -p "{c_path}" {f"-i {i_path}" if not no_inp else ""} -f {flag}'), capture_output=True, text=True, timeout=60)
-    return {"output": data.stdout, "error": data.stderr, "timeout_warning": False}
+    out_warning = len(data.stdout) > 128000
+    err_warning = len(data.stderr) > 128000
+    return {"output": data.stdout[:128000], "error": data.stderr[:128000], "timeout_warning": False, "memory_warning": {"stdout": out_warning, "stderr": err_warning}}
   except subprocess.TimeoutExpired as e:
     out = e.stdout
     if out is None:
@@ -41,4 +43,6 @@ def interpret():
       err = ''
     else:
       err = err.decode('utf-8')
-    return {"output": out, "error": err, "timeout_warning": True}
+    out_warning = len(data.stdout) > 128000
+    err_warning = len(data.stderr) > 128000
+    return {"output": out[:128000], "error": err[:128000], "timeout_warning": True, "memory_warning": {"stdout": out_warning, "stderr": err_warning}}
