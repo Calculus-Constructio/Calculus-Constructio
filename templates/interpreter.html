@@ -21,7 +21,7 @@ textarea {
   font-family: monospace;
 }
 .expand {width: 50%;}
-p:not(.h), h1, button, .center {text-align: center;}
+p:not(.h, .s), h1, button, .center {text-align: center;}
 .h {font-size: 2rem;}
 </style>
 </head>
@@ -31,6 +31,7 @@ p:not(.h), h1, button, .center {text-align: center;}
 <div id="run">
 <p class="h"><button type="button" id="code_button" data-toggle="collapse" data-target="#code_div" class="arrow">Code ▼</button></p>
 <div id="code_div" class="collapse">
+<p id="byte_count" class="s">0 bytes</p>
 <textarea id="code" autocorrect="off" name="code" spellcheck="false" placeholder="Enter code here..."></textarea>
 </div>
 <br/>
@@ -71,6 +72,9 @@ p:not(.h), h1, button, .center {text-align: center;}
 </div>
 </div>
 <script>
+function updateLength() {
+  $("#byte_count")[0].innerHTML = `${new TextEncoder().encode($("#code")[0].value).length} bytes`;
+}
 document.querySelectorAll(".arrow").forEach(function(button) {
   button.onclick = function() {
     let text = button.innerText.substring(0, button.innerText.length - 1);
@@ -90,6 +94,7 @@ document.querySelectorAll("textarea").forEach(function(textarea) {
   textarea.addEventListener("input", function() {
     this.style.height = "auto";
     this.style.height = this.scrollHeight + "px";
+    updateLength();
   });
 });
 function resize(textarea) {
@@ -115,6 +120,7 @@ addEventListener("DOMContentLoaded", function() {
       document.getElementById("input").value = input;
       resize(document.getElementById("input"));
       loadFlags(flag);
+      updateLength();
     };
 });
 function copyURL() {
