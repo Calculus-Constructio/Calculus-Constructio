@@ -31,8 +31,14 @@ def interpret():
     data = subprocess.run(shlex.split(f'python "{p_path}" -p "{c_path}" {f"-i {i_path}" if not no_inp else ""} -f {flag}'), capture_output=True, text=True, timeout=60)
     out_warning = len(data.stdout) > 128000
     err_warning = len(data.stderr) > 128000
-    os.remove(c_path)
-    os.remove(i_path)
+    try:
+      os.remove(c_path)
+    except:
+      pass
+    try:
+      os.remove(i_path)
+    except:
+      pass
     return {"output": data.stdout[:128000], "error": data.stderr[:128000], "timeout_warning": False, "memory_warning": {"stdout": out_warning, "stderr": err_warning}}
   except subprocess.TimeoutExpired as e:
     out = e.stdout
@@ -47,6 +53,12 @@ def interpret():
       err = err.decode('utf-8')
     out_warning = len(data.stdout) > 128000
     err_warning = len(data.stderr) > 128000
-    os.remove(c_path)
-    os.remove(i_path)
+    try:
+      os.remove(c_path)
+    except:
+      pass
+    try:
+      os.remove(i_path)
+    except:
+      pass
     return {"output": out[:128000], "error": err[:128000], "timeout_warning": True, "memory_warning": {"stdout": out_warning, "stderr": err_warning}}
