@@ -1,0 +1,198 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Calculus Constructio Online Interpreter</title>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<style>
+button {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  overflow: hidden;
+  outline: none;
+}
+textarea {
+  resize: none;
+  width: 100%;
+  min-height: 40px;
+  font-family: monospace;
+}
+.expand {width: 50%;}
+p:not(.h, .s), h1, button, .center {text-align: center;}
+.h {font-size: 2rem;}
+</style>
+</head>
+<body>
+<h1><a href="https://esolangs.org/wiki/Calculus_Constructio">Calculus Constructio</a> Web Interpreter</h1>
+<p>This website allows you to run any code in the language Calculus Constructio. The source code for this website is <a href="https://github.com/Calculus-Constructio/Calculus-Constructio-Web">here</a>.</p>
+<div id="run">
+<p class="h"><button type="button" id="code_button" data-toggle="collapse" data-target="#code_div" class="arrow">Code ▼</button></p>
+<div id="code_div" class="collapse">
+<p id="byte_count" class="s">0 bytes</p>
+<textarea id="code" autocorrect="off" name="code" spellcheck="false" placeholder="Enter code here..."></textarea>
+</div>
+<br/>
+<p class="h"><button type="button" id="input_button" data-toggle="collapse" data-target="#input_div" class="arrow">Input ▼</button></p>
+<div id="input_div" class="collapse">
+<textarea id="input" autocorrect="off" name="input" spellcheck="false" placeholder="Enter input here..."></textarea>
+</div>
+<br/>
+<p class="h"><button type="button" id="out_button" data-toggle="collapse" data-target="#output_div" class="arrow">STDOUT ▼</button></p>
+<div id="output_div" class="collapse">
+<textarea readonly id="output" placeholder="STDOUT will appear here..."></textarea>
+</div>
+<br/>
+<p class="h"><button type="button" id="err_button" data-toggle="collapse" data-target="#error_div" class="arrow">STDERR ▼</button></p>
+<div id="error_div" class="collapse">
+<textarea readonly id="error" placeholder="STDERR will appear here..."></textarea>
+</div>
+<br/>
+<p class="h"><button type="button" id="flag_button" data-toggle="collapse" data-target="#flags" class="arrow">Flags ▼</button></p>
+<div id="flags" class="collapse">
+<input type="checkbox" id="UseUnicodeInput"/>
+<label for="UseUnicodeInput">UseUnicodeInput</label><br/>
+<input type="checkbox" id="UseUnicodeOutput"/>
+<label for="UseUnicodeOutput">UseUnicodeOutput</label><br/>
+<input type="checkbox" id="OutputAllVars"/>
+<label for="OutputAllVars">OutputAllVars</label><br/>
+</div>
+<br/>
+<div style="text-align:center;">
+<p id="status"></p>
+<input id="gen_link" type="button" class="center" value="Get Link" onclick="toLink();"/>
+<input id="url" type="text" class="expand" readonly/>
+<input id="copy_link" type="button" class="center" value="Copy" onclick="copyURL();"/>
+<br/>
+<br/>
+<input id="submit" type="button" class="center" value="Run"/>
+<p id="warning"></p>
+</div>
+</div>
+<script>
+function updateLength() {
+  $("#byte_count")[0].innerHTML = `${new TextEncoder().encode($("#code")[0].value).length} bytes`;
+}
+document.querySelectorAll(".arrow").forEach(function(button) {
+  button.onclick = function() {
+    let text = button.innerText.substring(0, button.innerText.length - 1);
+    setTimeout(function() {
+      if (button.ariaExpanded === "true") {
+        button.innerText = text + "▲";
+      } else {
+        button.innerText = text + "▼";
+      };
+    })
+  };
+})
+document.querySelectorAll("textarea").forEach(function(textarea) {
+  textarea.style.height = textarea.scrollHeight + "px";
+  textarea.style.overflowY = "hidden";
+
+  textarea.addEventListener("input", function() {
+    this.style.height = "auto";
+    this.style.height = this.scrollHeight + "px";
+    updateLength();
+  });
+});
+function resize(textarea) {
+  textarea.style.height = "0px";
+  textarea.style.height = textarea.scrollHeight + "px";
+  textarea.style.overflowY = "hidden";
+}
+function loadFlags(binary_string) {
+  let b = "0".repeat(3 - binary_string.length) + binary_string
+  document.getElementById("OutputAllVars").checked = parseInt(b[0]);
+  document.getElementById("UseUnicodeOutput").checked = parseInt(b[1]);
+  document.getElementById("UseUnicodeInput").checked = parseInt(b[2]);
+};
+addEventListener("DOMContentLoaded", function() {
+    let url = document.URL;
+    if (url.includes("#")) {
+      data = url.substring(url.indexOf('#') + 1).split("!");
+      code = new TextDecoder('utf-8').decode(Uint8Array.fromBase64(data[0], {alphabet: "base64url"}));
+      input = new TextDecoder('utf-8').decode(Uint8Array.fromBase64(data[1], {alphabet: "base64url"}));
+      flag = parseInt(data[2]).toString(2);
+      document.getElementById("code").value = code;
+      resize(document.getElementById("code"));
+      document.getElementById("input").value = input;
+      resize(document.getElementById("input"));
+      loadFlags(flag);
+      updateLength();
+    };
+});
+function copyURL() {
+  let button = document.getElementById("copy_link");
+  navigator.clipboard.writeText(document.getElementById("url").value).then(
+    () => {
+      button.value = "Copied to clipboard!";
+      setTimeout(() => {button.value = "Copy"}, 1500);
+    },
+    () => {
+      button.value = "Failed to copy to clipboard!";
+      setTimeout(() => {button.value = "Copy"}, 1500);
+    },
+  );
+};
+function toLink() {
+  let base_url = document.URL;
+  if (base_url.includes("#")) {
+    base_url = base_url.substring(0, base_url.indexOf('#'));
+  };
+  let code = new TextEncoder().encode(document.getElementById("code").value).toBase64({alphabet: 'base64url', omitPadding: true});
+  let input = new TextEncoder().encode(document.getElementById("input").value).toBase64({alphabet: 'base64url', omitPadding: true});
+  let flag = getFlagValue();
+  let url = `${base_url}#${code}!${input}!${flag}`;
+  document.getElementById("url").value = url;
+};
+window.post = function(url, data) {
+  return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
+};
+function getFlagValue() {
+    return (document.getElementById("OutputAllVars").checked*4 + document.getElementById("UseUnicodeOutput").checked*2 + document.getElementById("UseUnicodeInput").checked*1)
+};
+let lock = false
+async function doit() {
+    if (!lock) {
+        lock = true;
+        let base_url = document.URL;
+        if (base_url.includes("#")) {
+          base_url = base_url.substring(0, base_url.indexOf('#'));
+        }
+        document.getElementById("status").innerText = "Running...";
+        document.getElementById("warning").innerHTML = "";
+        document.getElementById("output").innerText = "";
+        document.getElementById("error").innerText = "";
+        try {
+          let promise = post(`${base_url}interpret/`, {'code': document.getElementById("code").value, 'input': document.getElementById("input").value, 'flag': getFlagValue()});
+          let response = await promise.then(function(response){return response.json();});
+          if ($("#out_button")[0].ariaExpanded === "false" || $("#out_button")[0].ariaExpanded === "undefined" || $("#out_button")[0].ariaExpanded === null) {
+            $("#out_button").click();
+          };
+          if ($("#err_button")[0].ariaExpanded === "false" || $("#err_button")[0].ariaExpanded === "undefined" || $("#err_button")[0].ariaExpanded === null) {
+            $("#err_button").click();
+          };
+          document.getElementById("output").value = response["output"];
+          document.getElementById("error").value = response["error"];
+          resize(document.getElementById("output"));
+          resize(document.getElementById("error"));
+          document.getElementById("warning").innerHTML = `<br/>${"The program exceeded the 60 second time limit and was killed.".repeat(response.timeout_warning)}<br/>${"STDOUT exceeded 128,000 characters".repeat(response.memory_warning.stdout)}<br/>${"STDERR exceeded 128,000 characters".repeat(response.memory_warning.stderr)}`;
+          document.getElementById("status").innerText = "";
+        } catch (error) {
+          document.getElementById("warning").innerHTML = `<br/>There was an error with backend communication!<br/><pre>${error}</pre>`;
+          document.getElementById("status").innerText = "";
+        };
+        lock = false
+    };
+};
+document.getElementById("submit").onclick=async() => {
+  await doit();
+};
+$("#code_button").click();
+$("#input_button").click();
+$("#flag_button").click();
+</script>
+</body>
+</html>
