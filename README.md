@@ -98,3 +98,4 @@ It is worth noting that each instruction has a long form and a short form, and w
 | `Halt`       | `H`        | `Any`                               | Prints the given value to STDOUT, prints `Program has halted.` to STDERR, and terminates the program. Useful for debugging.                                                   |
 | `Print`      | `>`        | `Any`                               | Prints the given value to STDOUT. Does not terminate the program. Useful for debugging.                                                                                       |
 | `Ternary`    | `{`        | `Point, Any, Any`                   | If the given point is truthy, return the second argument, otherwise, return the third.                                                |
+| `Repeat`     | `R`        | `CFunction, Point, List`            | Repeatedly applies the function to the given list of arguments a specific number of times stated as the x coordinate of the point.|
