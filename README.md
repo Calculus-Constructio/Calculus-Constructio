@@ -1,7 +1,14 @@
 # Calculus Constructio
 A programming language involving the construction of lines, circles, polynomial and parametric curves, and intersections.
 
-To execute, run `python main.py` along with the necessary arguments below.
+## Installation
+```
+pip install git+https://github.com/Calculus-Constructio/Calculus-Constructio.git
+``` 
+## Execution
+```
+calculus_constructio -p PROGRAM -i INPUT -f FLAGS
+```
 ## Links
 * [Esolangs.org entry](https://esolangs.org/wiki/Calculus_Constructio#List_of_instructions)
 * [Online interpreter](https://calculus-constructio-web.onrender.com/)

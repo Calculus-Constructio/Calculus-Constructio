@@ -2,14 +2,14 @@ import re
 import argparse
 from ast import literal_eval
 from typing import List, Any, Optional, Tuple
-from classes.instructions import (
+from calculus_constructio.classes.instructions import (
     Statement,
     CFunction,
     CModule
 )
-from classes.flags import CFlag
-from classes.constructions import Point
-from classes.errors import IncompatibleFlags, IOError
+from calculus_constructio.classes.flags import CFlag
+from calculus_constructio.classes.constructions import Point
+from calculus_constructio.classes.errors import IncompatibleFlags, IOError
 
 INCOMPATIBLE = [(CFlag.OutputAllVars, CFlag.UseUnicodeOutput)]
 
@@ -97,7 +97,7 @@ def evaluate_prog(statements: List[Statement],
     return o
 
 
-def arg_parse():
+def arg_parse(argv=None):
     arg = argparse.ArgumentParser(
         description="Interprets a file in the \
 Calculus Constructio programming language."
@@ -119,11 +119,11 @@ Calculus Constructio programming language."
         "--input",
         help="Provides the path to the file to be used as input.",
     )
-    return arg.parse_args()
+    return arg.parse_args(argv)
 
 
-if __name__ == "__main__":
-    args = vars(arg_parse())
+def main(argv=None):
+    args = vars(arg_parse(argv))
     flags = CFlag(args["flag"])
     prog = args["program"]
     with open(prog) as file:
@@ -138,3 +138,7 @@ if __name__ == "__main__":
         inp = "" if CFlag.UseUnicodeInput in flags else []
     result = evaluate_prog(*parse_prog(code), inp, flags)
     print(result)
+    return 0
+
+if __name__ == "__main__":
+    main()

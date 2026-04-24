@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import List, Optional, Tuple, Any, NoReturn
 from collections.abc import Callable
-from classes.constructions import (Construction,
+from calculus_constructio.classes.constructions import (Construction,
                                    Point,
                                    Polynomial,
                                    Parametric,
                                    Line,
                                    Circle,
                                    )
-from classes.errors import FunctionMisuse
+from calculus_constructio.classes.errors import FunctionMisuse
 from sympy import Eq
 import sys
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Tuple, List, Any
 
-from classes.errors import (
+from calculus_constructio.classes.errors import (
     UnsupportedCCOperation, ConstraintIssue
 )
 
