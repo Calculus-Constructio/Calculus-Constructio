@@ -114,7 +114,7 @@ class Construction:
             type(self).ERROR_ON_POINT_EQUALITY
         )):
             raise ConstraintIssue("Points must be different.")
-        self.points = points
+        self.points = list(points)
 
     def __getattr__(self, attr: str) -> Any:
         if attr[:5] == "point":
