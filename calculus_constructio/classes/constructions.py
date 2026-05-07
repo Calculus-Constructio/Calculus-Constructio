@@ -34,10 +34,10 @@ def solve_simultaneous(*args):
             try:
                 assert sols[0].x.is_real and sols[0].y.is_real
             except AttributeError:
-                assert not any(
+                assert not any([
                     isinstance(sols[0].x, complex),
                     isinstance(sols[0].y, complex)
-                )
+                ])
         except AssertionError:
             sols = []
     if len(sols) == 0:
