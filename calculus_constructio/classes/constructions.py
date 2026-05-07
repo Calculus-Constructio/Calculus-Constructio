@@ -69,7 +69,7 @@ class Point:
             self.y = float(args[1])
 
     def __eq__(self, other: Point) -> bool | Eq:
-        return Eq(self.x, other.x) & Eq(self.y, other.y)
+        return bool(Eq(self.x, other.x) & Eq(self.y, other.y))
 
     def __matmul__(self, other: Point) -> float:
         return sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
