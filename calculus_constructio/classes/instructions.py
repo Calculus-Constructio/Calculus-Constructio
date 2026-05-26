@@ -181,12 +181,12 @@ def slice(lisst: list, start_p: Point, end_p: Point) -> list:
 
 
 @instruction("Polynomial", None, "P")
-def poly(*args: Point) -> Polynomial:
+def poly(args: List[Point]) -> Polynomial:
     return Polynomial(*args)
 
 
 @instruction("Parametric", None, "A")
-def para(*args: Point) -> Parametric:
+def para(args: List[Point]) -> Parametric:
     return Parametric(*args)
 
 
