@@ -34,10 +34,10 @@ def solve_simultaneous(*args):
             try:
                 assert sols[0].x.is_real and sols[0].y.is_real
             except AttributeError:
-                assert not any(
+                assert not any([
                     isinstance(sols[0].x, complex),
                     isinstance(sols[0].y, complex)
-                )
+                ])
         except AssertionError:
             sols = []
     if len(sols) == 0:
@@ -69,7 +69,7 @@ class Point:
             self.y = float(args[1])
 
     def __eq__(self, other: Point) -> bool | Eq:
-        return Eq(self.x, other.x) & Eq(self.y, other.y)
+        return bool(Eq(self.x, other.x) & Eq(self.y, other.y))
 
     def __matmul__(self, other: Point) -> float:
         return sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
@@ -114,7 +114,7 @@ class Construction:
             type(self).ERROR_ON_POINT_EQUALITY
         )):
             raise ConstraintIssue("Points must be different.")
-        self.points = points
+        self.points = list(points)
 
     def __getattr__(self, attr: str) -> Any:
         if attr[:5] == "point":
