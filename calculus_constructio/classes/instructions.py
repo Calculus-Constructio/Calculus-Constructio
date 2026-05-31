@@ -136,7 +136,7 @@ class COracle:
     that this programming language would otherwise
     not be able to do.
     """
-    def __init__(self, name: str, function: FunctionType):
+    def __init__(self, function: FunctionType, name: str):
         self.function = function
         self.name = name
     
