@@ -159,7 +159,7 @@ def check_if_scaled(p1: Tuple[int, int], p2: Tuple[int, int]) -> Eq:
 
     return Eq(s1, s2)
 
-ORACLES = [*map(COracle, ORACLES)]
+ORACLES = [*map(lambda t:COracle(*t), ORACLES)]
 
 def instruction(name: str, args: Optional[int], alias: Optional[str] = None)\
         -> Callable:
