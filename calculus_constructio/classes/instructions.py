@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import List, Optional, Tuple, Any, NoReturn, Function
+from typing import List, Optional, Tuple, Any, NoReturn
+from types import FunctionType
 from collections.abc import Callable
 from calculus_constructio.classes.constructions import (Construction,
                                    Point,
@@ -135,7 +136,7 @@ class COracle:
     that this programming language would otherwise
     not be able to do.
     """
-    def __init__(self, name: str, function: Function):
+    def __init__(self, name: str, function: FunctionType):
         self.function = function
         self.name = name
     
