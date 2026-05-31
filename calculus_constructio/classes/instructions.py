@@ -20,8 +20,8 @@ from secrets import choice
 elems = {}
 aliases = {}
 ORACLES = [
-    (lambda *s: str_to_points(urlopen(points_to_str(s)).read().decode('utf-8')), "HTTP")
-    (lambda *l: choice(l), "Random")
+    (lambda *s: str_to_points(urlopen(points_to_str(s)).read().decode('utf-8')), "HTTP"),
+    (lambda *l: choice(l), "Random"),
     (lambda p: sleep(p.x), "Sleeping")
 ]
 
