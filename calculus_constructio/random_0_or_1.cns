@@ -1,0 +1,3 @@
+random:Index oracles,one
+zerone:NewList zero,one
+output:Apply random,zerone

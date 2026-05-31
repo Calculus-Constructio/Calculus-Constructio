@@ -2,17 +2,21 @@ import re
 import argparse
 from ast import literal_eval
 from typing import List, Any, Optional, Tuple
+
 from calculus_constructio.classes.instructions import (
     Statement,
     CFunction,
-    CModule
+    CModule,
+    COracle,
+    str_to_points,
+    points_to_str,
+    ORACLES
 )
 from calculus_constructio.classes.flags import CFlag
 from calculus_constructio.classes.constructions import Point
 from calculus_constructio.classes.errors import IncompatibleFlags, IOError
 
 INCOMPATIBLE = [(CFlag.OutputAllVars, CFlag.UseUnicodeOutput)]
-
 
 def single_parse(line: str):
     var, other = line.split(":", 1)
@@ -43,7 +47,7 @@ def parse_prog(prog: str)\
             for p in args:
                 with open(p + ".cns") as file:
                     code = parse_prog(file.read())
-                m.append(CModule(*code, {}, var))
+                m.append(CModule(*code, {"oracles": ORACLES}, var))
         elif instruction in ("Define", "$"):
             p = c
             while single_parse(lines[c]) not in [
@@ -74,12 +78,12 @@ def evaluate_prog(statements: List[Statement],
             raise IncompatibleFlags("Flags are incompatible.")
 
     if CFlag.UseUnicodeInput in flags:
-        inp = [Point(ord(x), 0) for x in inp]
+        inp = str_to_points(inp)
     module = CModule(
         statements,
         functions,
         modules,
-        {"input": inp},
+        {"input": inp, "oracles": ORACLES},
         "__main__"
     )
     res = module.evaluate()
@@ -92,7 +96,7 @@ def evaluate_prog(statements: List[Statement],
         raise IOError("Program did not output.")
 
     if CFlag.UseUnicodeOutput in flags:
-        o = ''.join(chr(int(p.x)) for p in o)
+        o = points_to_str(o)
 
     return o
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional, Tuple, Any, NoReturn
+from typing import List, Optional, Tuple, Any, NoReturn, Function
 from collections.abc import Callable
 from calculus_constructio.classes.constructions import (Construction,
                                    Point,
@@ -12,11 +12,23 @@ from calculus_constructio.classes.constructions import (Construction,
 from calculus_constructio.classes.errors import FunctionMisuse
 from sympy import Eq
 import sys
-
+from time import sleep
+from urllib.request import urlopen
+from secrets import choice
 
 elems = {}
 aliases = {}
+ORACLES = [
+    (lambda *s: str_to_points(urlopen(points_to_str(s)).read().decode('utf-8')), "HTTP")
+    (lambda *l: choice(l), "Random")
+    (lambda p: sleep(p.x), "Sleeping")
+]
 
+def str_to_points(s: str):
+    return [Point(ord(x), 0) for x in s]
+
+def points_to_str(l: List[Point]):
+    return ''.join(chr(int(p.x)) for p in l)
 
 class Statement:
     """
@@ -74,6 +86,7 @@ class CFunction:
         d.update(dict(zip(self.args, args)))
         d["zero"] = Point(0, 0)
         d["one"] = Point(1, 0)
+        d["oracles"] = ORACLES
         d["return"] = []
         for s in self.statements:
             d[s.var] = s.evaluate(*(d[x] for x in s.arg_vars))
@@ -85,7 +98,8 @@ class CFunction:
 
 class CModule:
     """
-    A program that has been imported into the main program.
+    A program that has been imported into the main program,
+    or possibly the main program itself.
     """
     def __init__(
             self,
@@ -115,6 +129,21 @@ class CModule:
             vars[s.var] = s.evaluate(*(vars[x] for x in s.arg_vars))
         return vars
 
+class COracle:
+    """
+    An oracle that is capable of doing things
+    that this programming language would otherwise
+    not be able to do.
+    """
+    def __init__(self, name: str, function: Function):
+        self.function = function
+        self.name = name
+    
+    def invoke(self, args):
+        return self.function(*args)
+
+    def __repr__(self):
+        return f"{self.name} Oracle"
 
 def check_if_scaled(p1: Tuple[int, int], p2: Tuple[int, int]) -> Eq:
     try:
@@ -129,6 +158,7 @@ def check_if_scaled(p1: Tuple[int, int], p2: Tuple[int, int]) -> Eq:
 
     return Eq(s1, s2)
 
+ORACLES = [*map(COracle, ORACLES)]
 
 def instruction(name: str, args: Optional[int], alias: Optional[str] = None)\
         -> Callable:
@@ -156,7 +186,7 @@ def construct_circle(center: Point, circumference_point: Point) -> Circle:
 
 
 @instruction("Intersect", 2, "X")
-def intersect(con1: Construction, con2: Construction) -> List[Point]:
+def intersect(con1: Construction | COracle, con2: Construction | list) -> List[Point]:
     return con1 & con2
 
 
@@ -208,8 +238,10 @@ def new(*args: object) -> list:
 
 
 @instruction("Apply", 2, "Y")
-def apply(f: CFunction, lisst: list) -> object:
-    return f.evaluate(*lisst)
+def apply(f: CFunction | COracle, lisst: list) -> object:
+    if type(f) is CFunction:
+        return f.evaluate(*lisst)
+    return f.invoke(lisst)
 
 
 @instruction("Closer", 3, "@")
