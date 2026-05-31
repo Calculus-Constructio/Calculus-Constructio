@@ -294,11 +294,13 @@ def halt(s: Any) -> NoReturn:
     sys.stderr.write("Program has halted.")
     print(s)
     sys.exit(0)
+    return s
 
 
 @instruction("Print", 1, ">")
 def prin(s: Any) -> None:
     print(s)
+    return s
 
 @instruction("Ternary", 3, "{")
 def ternary(cond: Point, true: object, false: object) -> object:
