@@ -187,7 +187,7 @@ def construct_circle(center: Point, circumference_point: Point) -> Circle:
 
 
 @instruction("Intersect", 2, "X")
-def intersect(con1: Construction | COracle, con2: Construction | list) -> List[Point]:
+def intersect(con1: Construction, con2: Construction) -> List[Point]:
     return con1 & con2
 
 
